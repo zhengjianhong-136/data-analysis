@@ -1,7 +1,66 @@
-# sql基础
+# 1、sql基础
 基础入门教程：https://www.w3school.com.cn/sql/sql_select.asp
-# sql进阶
-# sql 实例
+# 2、sql进阶函数
+## 窗口函数
+窗口函数是一类分析函数，类似group by，但是不会减少数据的行数，常用语对数据排序、累计计算、移动操作等。
+
+格式一般为：function_name() OVER ([PARTITION BY column1, column2, ...][ORDER BY column3, column4, ...])
+
+- PARTITION BY 定义分组范围
+- ORDER BY 定义排序
+
+例如：row_number() over(partition by userid order by visit_date)，含义为userid的维度下，按照visit_date升序后进行排序生成一个新的字段
+### 数据排序
+对数据的排序，一般有3个函数
+- ROW_NUMBER(): 连续排序，不重复
+- RANK(): 并列排序，会跳过重复的排名
+- DENSE_RANK(): 并列排序，不跳过排名
+### 累计计算
+可以使用 SUM, AVG, COUNT, MAX, MIN 等
+
+例如：SUM(salary) OVER (PARTITION BY dept_id) as total_dept_salary，含义是不断累加到当前行的salary值
+### 移动数据
+- LAG: 访问前面的行
+- LEAD: 访问后面的行
+
+## 列聚合函数
+- collect_set 可以将一列的值聚合成一个数组（集合），并且会自动去除重复值
+- collect_list 用法和collect_set一样，但是不进行去重
+``` sql
+-- 假设有一个订单表 orders(user_id, product_id)
+SELECT 
+    user_id,
+    collect_set(product_id) as purchased_products
+FROM orders
+GROUP BY user_id;
+
+-- 统计数组元素个数：size()
+SELECT 
+    user_id,
+    size(collect_set(product_id)) as unique_product_count
+FROM orders
+GROUP BY user_id;
+
+--判断数组是否有某个特定元素
+array_contains(collect_set(status), 'completed') as has_completed
+```
+## 时间处理函数
+- datediff(end_date, start_date)：计算日期差距天数
+- months_between()：计算月份差
+- datediff() 除以 365
+- date_format(date, format_string)，日期格式化函数
+- from_unixtime: 将Unix时间戳转为可读时间格式
+- unix_timestamp: 将日期转为Unix时间戳
+```sql
+SELECT datediff('2024-01-04', '2024-01-01') as days_diff;  -- 返回 3
+SELECT months_between('2024-01-04', '2023-01-04') as month_diff;  -- 返回 12.0
+SELECT date_format('2024-01-04 13:45:30', 'yyyy-MM-dd') as formatted_date; -- 返回 2024-01-04
+SELECT date_format('2024-01-04 13:45:30', 'yyyy-MM-dd HH:mm:ss') as formatted_datetime; -- 返回 2024-01-04 13:45:30
+SELECT from_unixtime(1704355200, 'yyyy-MM-dd');  -- 指定格式
+SELECT unix_timestamp('2024-01-04 12:00:00');  -- 日期时间转时间戳
+```
+
+# 3、sql 实例
 ## 行转列
 ```sql
 # 原表结构: 姓名,课程,分数
@@ -111,7 +170,7 @@ FROM your_table;
 2020-01，B,2000,700,35%,100,5%,men，women，kids
 
 2020-01，C,5000,1000,20%,500,10%,kids，young，men
-```
+``` sql
 with user_fst_order_info as (	--用户首单信息
 	select user_id
 		,fst_pay_time
@@ -141,8 +200,8 @@ with user_fst_order_info as (	--用户首单信息
 user_fst_order_label as (	--用户首单标签
 	select *
 		,case
-			when fst_cate_num = 1 and array_contains(fst_cate_nm) = 'women' then 'A'
-			when fst_cate_num = 2 and array_contains(fst_cate_nm) = 'women' and array_contains(fst_cate_nm) = 'men' then 'B'
+			when fst_cate_num = 1 and array_contains(fst_cate_nm,'women') then 'A'
+			when fst_cate_num = 2 and array_contains(fst_cate_nm,'women') and array_contains(fst_cate_nm,'men') then 'B'
 			else 'C'
 		end as new_user_label
 	from user_fst_order_info

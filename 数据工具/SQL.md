@@ -1,3 +1,8 @@
+# 目录
+- [1、sql基础](#1、sql基础)
+- [2、sql进阶函数](#2、sql进阶函数)
+- [3、sql实例](#3、sql实例)
+
 # 1、sql基础
 基础入门教程：https://www.w3school.com.cn/sql/sql_select.asp
 # 2、sql进阶函数
@@ -60,7 +65,7 @@ SELECT from_unixtime(1704355200, 'yyyy-MM-dd');  -- 指定格式
 SELECT unix_timestamp('2024-01-04 12:00:00');  -- 日期时间转时间戳
 ```
 
-# 3、sql 实例
+# 3、sql实例
 ## 行转列
 ```sql
 # 原表结构: 姓名,课程,分数

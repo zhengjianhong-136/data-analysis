@@ -1,7 +1,7 @@
 # 目录
-- [1、sql基础](#1、sql基础)
-- [2、sql进阶函数](#2、sql进阶函数)
-- [3、sql实例](#3、sql实例)
+- [1、sql基础](#1sql基础)
+- [2、sql进阶函数](#2sql进阶函数)
+- [3、sql实例](#3sql实例)
 
 # 1、sql基础
 基础入门教程：https://www.w3school.com.cn/sql/sql_select.asp
